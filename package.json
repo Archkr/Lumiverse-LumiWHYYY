@@ -1,0 +1,32 @@
+{
+  "name": "lumiverse-lumi-whyyy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "author": "Archkr",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "repository": "https://github.com/Archkr/Lumiverse-LumiWHYYY",
+  "description": "A configurable recurring Foxy jumpscare for Lumiverse.",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:dist": "node scripts/check-dist.mjs",
+    "contract": "node tests/source-contract.mjs",
+    "check": "npm run typecheck && npm run test && npm run build && npm run check:dist && npm run contract"
+  },
+  "dependencies": {
+    "preact": "^10.27.2"
+  },
+  "devDependencies": {
+    "@testing-library/preact": "^3.2.4",
+    "@types/node": "^24.1.0",
+    "esbuild": "^0.28.1",
+    "happy-dom": "^18.0.1",
+    "lumiverse-spindle-types": "0.6.23",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.0"
+  }
+}
+
