@@ -1,6 +1,5 @@
 export const LUMI_WHYYY_ID = "lumi_whyyy" as const;
 export const SCHEMA_VERSION = 1 as const;
-export const JUMPSCARE_DURATION_MS = 4_923;
 export const MIN_PLAYBACK_RATE = 0.25;
 export const MAX_PLAYBACK_RATE = 4;
 

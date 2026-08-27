@@ -4,6 +4,7 @@ export interface AudioElementLike {
   volume: number;
   playbackRate: number;
   defaultPlaybackRate: number;
+  duration: number;
   muted: boolean;
   currentTime: number;
   play(): Promise<void>;
@@ -41,6 +42,11 @@ export class JumpscareAudioController {
     this.playbackRate = playbackRate;
     this.audio.defaultPlaybackRate = playbackRate;
     this.audio.playbackRate = playbackRate;
+  }
+
+  getPlaybackDurationMs(): number | null {
+    const durationMs = this.audio.duration * 1_000 / this.playbackRate;
+    return Number.isFinite(durationMs) && durationMs > 0 ? durationMs : null;
   }
 
   async unlock(): Promise<boolean> {

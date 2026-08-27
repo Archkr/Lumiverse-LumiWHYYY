@@ -289,7 +289,6 @@ export class LumiWhyyyRuntime {
     const previous = this.snapshot.settings;
     this.audio.setVolume(normalized.volume);
     this.audio.setPlaybackRate(normalized.playbackRate);
-    this.presenter?.setPlaybackRate(normalized.playbackRate);
     this.update({ settings: normalized });
     if (previous.intervalSeconds !== normalized.intervalSeconds) {
       this.scheduler.setIntervalMs(normalized.intervalSeconds * 1_000);
@@ -330,7 +329,6 @@ export class LumiWhyyyRuntime {
         this.imageUrl,
         (error) => this.notify("warning", `${error.message} Foxy still showed up.`),
       );
-      this.presenter.setPlaybackRate(this.snapshot.settings.playbackRate);
     } catch (error) {
       this.presenter = null;
       this.notify("error", error instanceof Error ? error.message : "Could not create the jumpscare overlay.");

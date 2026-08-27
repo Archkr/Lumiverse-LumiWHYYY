@@ -17,7 +17,7 @@ LumiWHYYY does one thing: after a configurable amount of visible Lumiverse time,
 - Any positive finite interval, with no arbitrary maximum
 - Seconds, minutes, and hours controls
 - Fullscreen, cover-fitted Foxy image
-- Bundled 4.92-second MP3 with volume and 0.25×–4× playback-speed controls
+- Bundled MP3 with volume and 0.25×–4× playback-speed controls
 - Countdown that pauses while the Lumiverse tab is hidden
 - Click or `Escape` to dismiss immediately
 - A test button that does not arm recurring scares

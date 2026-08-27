@@ -1,8 +1,7 @@
-import { JUMPSCARE_DURATION_MS } from "./types";
-
 export interface PresenterAudio {
   play(onEnded: () => void, onError: (error: Error) => void): Promise<void>;
   stop(): void;
+  getPlaybackDurationMs(): number | null;
 }
 
 export interface PresenterWidget {
@@ -18,7 +17,6 @@ export class JumpscarePresenter {
   private activeResolve: ((reason: JumpscareEndReason) => void) | null = null;
   private fallbackTimer: ReturnType<typeof setTimeout> | null = null;
   private previousFocus: HTMLElement | null = null;
-  private playbackRate = 1;
   private destroyed = false;
   private readonly keyHandler = (event: KeyboardEvent) => {
     if (event.key === "Escape") this.finish("dismissed", true);
@@ -29,7 +27,6 @@ export class JumpscarePresenter {
     private readonly audio: PresenterAudio,
     imageUrl: string,
     private readonly onAudioError: (error: Error) => void,
-    private readonly durationMs = JUMPSCARE_DURATION_MS,
   ) {
     this.overlay = document.createElement("button");
     this.overlay.type = "button";
@@ -52,10 +49,6 @@ export class JumpscarePresenter {
     return this.activeResolve !== null;
   }
 
-  setPlaybackRate(playbackRate: number): void {
-    this.playbackRate = playbackRate;
-  }
-
   present(): Promise<JumpscareEndReason> {
     if (this.destroyed) return Promise.resolve("destroyed");
     if (this.activeResolve) return Promise.resolve("dismissed");
@@ -71,19 +64,16 @@ export class JumpscarePresenter {
 
     return new Promise<JumpscareEndReason>((resolve) => {
       this.activeResolve = resolve;
-      this.fallbackTimer = setTimeout(
-        () => this.finish("timeout", true),
-        this.playbackDurationMs() + 750,
-      );
       void this.audio.play(
         () => this.finish("ended", false),
         (error) => {
           this.onAudioError(error);
-          if (this.fallbackTimer) clearTimeout(this.fallbackTimer);
-          this.fallbackTimer = setTimeout(
-            () => this.finish("timeout", false),
-            this.playbackDurationMs(),
-          );
+          const durationMs = this.audio.getPlaybackDurationMs();
+          if (durationMs === null) {
+            this.finish("timeout", false);
+            return;
+          }
+          this.fallbackTimer = setTimeout(() => this.finish("timeout", false), durationMs);
         },
       );
     });
@@ -125,9 +115,5 @@ export class JumpscarePresenter {
     } catch {
       // A permission-gated placement can disappear before the frontend receives state.
     }
-  }
-
-  private playbackDurationMs(): number {
-    return this.durationMs / this.playbackRate;
   }
 }

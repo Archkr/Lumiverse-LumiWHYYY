@@ -26,7 +26,7 @@ if (!/export\s*\{[\s\S]*setup/.test(frontend)) violations.push("frontend bundle 
 if (!frontend.includes("data:image/jpeg;base64,")) violations.push("frontend bundle does not inline the JPG");
 if (!frontend.includes("data:audio/mpeg;base64,")) violations.push("frontend bundle does not inline the MP3");
 if (image.size !== 137_561) violations.push("provided jumpscare.jpg bytes changed");
-if (audio.size !== 79_758) violations.push("provided jumpscare.mp3 bytes changed");
+if (audio.size === 0) violations.push("jumpscare.mp3 is empty");
 if (/MIN_INTERVAL_SECONDS|MAX_INTERVAL_SECONDS|Allowed range:/.test(frontend)) {
   violations.push("frontend still contains an arbitrary interval bound");
 }

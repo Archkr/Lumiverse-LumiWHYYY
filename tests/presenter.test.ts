@@ -12,6 +12,7 @@ class FakeWidget implements PresenterWidget {
 }
 
 class FakePresenterAudio implements PresenterAudio {
+  durationMs: number | null = 1_000;
   ended: (() => void) | null = null;
   failed: ((error: Error) => void) | null = null;
   stop = vi.fn();
@@ -19,6 +20,7 @@ class FakePresenterAudio implements PresenterAudio {
     this.ended = ended;
     this.failed = failed;
   });
+  getPlaybackDurationMs = vi.fn(() => this.durationMs);
 }
 
 describe("JumpscarePresenter", () => {
@@ -28,7 +30,7 @@ describe("JumpscarePresenter", () => {
   it("shows until audio ends", async () => {
     const widget = new FakeWidget();
     const audio = new FakePresenterAudio();
-    const presenter = new JumpscarePresenter(widget, audio, "data:image/jpeg;base64,test", vi.fn(), 1_000);
+    const presenter = new JumpscarePresenter(widget, audio, "data:image/jpeg;base64,test", vi.fn());
     const result = presenter.present();
     expect(widget.visible).toBe(true);
     audio.ended?.();
@@ -39,7 +41,7 @@ describe("JumpscarePresenter", () => {
   it("supports click and Escape dismissal", async () => {
     const widget = new FakeWidget();
     const audio = new FakePresenterAudio();
-    const presenter = new JumpscarePresenter(widget, audio, "image", vi.fn(), 1_000);
+    const presenter = new JumpscarePresenter(widget, audio, "image", vi.fn());
     const clicked = presenter.present();
     (widget.root.querySelector("button") as HTMLButtonElement).click();
     await expect(clicked).resolves.toBe("dismissed");
@@ -54,7 +56,7 @@ describe("JumpscarePresenter", () => {
     const widget = new FakeWidget();
     const audio = new FakePresenterAudio();
     const onError = vi.fn();
-    const presenter = new JumpscarePresenter(widget, audio, "image", onError, 1_000);
+    const presenter = new JumpscarePresenter(widget, audio, "image", onError);
     const result = presenter.present();
     audio.failed?.(new Error("blocked"));
     expect(widget.visible).toBe(true);
@@ -64,11 +66,11 @@ describe("JumpscarePresenter", () => {
     expect(widget.visible).toBe(false);
   });
 
-  it("adjusts the failed-audio fallback to playback speed", async () => {
+  it("uses the MP3-derived playback duration for the failed-audio fallback", async () => {
     const widget = new FakeWidget();
     const audio = new FakePresenterAudio();
-    const presenter = new JumpscarePresenter(widget, audio, "image", vi.fn(), 1_000);
-    presenter.setPlaybackRate(2);
+    audio.durationMs = 500;
+    const presenter = new JumpscarePresenter(widget, audio, "image", vi.fn());
     const result = presenter.present();
     audio.failed?.(new Error("blocked"));
     vi.advanceTimersByTime(499);
@@ -79,7 +81,7 @@ describe("JumpscarePresenter", () => {
 
   it("resolves an active presentation during teardown", async () => {
     const widget = new FakeWidget();
-    const presenter = new JumpscarePresenter(widget, new FakePresenterAudio(), "image", vi.fn(), 1_000);
+    const presenter = new JumpscarePresenter(widget, new FakePresenterAudio(), "image", vi.fn());
     const result = presenter.present();
     presenter.destroy();
     await expect(result).resolves.toBe("destroyed");
