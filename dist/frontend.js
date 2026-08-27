@@ -1428,14 +1428,10 @@ function Dashboard({
     /* @__PURE__ */ u3("section", { class: "lw-hero", children: [
       /* @__PURE__ */ u3("img", { src: imageUrl, alt: "Foxy", draggable: false }),
       /* @__PURE__ */ u3("div", { class: "lw-hero-shade" }),
-      /* @__PURE__ */ u3("div", { class: "lw-hero-copy", children: [
-        /* @__PURE__ */ u3("span", { class: "lw-eyebrow", children: "A deeply necessary extension" }),
-        /* @__PURE__ */ u3("h1", { children: [
-          "Lumi",
-          /* @__PURE__ */ u3("span", { children: "WHYYY" })
-        ] }),
-        /* @__PURE__ */ u3("p", { children: "Recurring Foxy delivery, calibrated with alarming precision." })
-      ] }),
+      /* @__PURE__ */ u3("div", { class: "lw-hero-copy", children: /* @__PURE__ */ u3("h1", { children: [
+        "Lumi",
+        /* @__PURE__ */ u3("span", { children: "WHYYY" })
+      ] }) }),
       /* @__PURE__ */ u3("span", { class: "lw-version", children: [
         "v",
         version
@@ -1682,16 +1678,6 @@ var LUMI_WHYYY_CSS = String.raw`
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.72);
 }
 
-.lw-eyebrow {
-  display: block;
-  margin-bottom: 7px;
-  color: #ffd3c8;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
 .lw-hero h1 {
   margin: 0;
   color: #fff;
@@ -1702,7 +1688,6 @@ var LUMI_WHYYY_CSS = String.raw`
 }
 
 .lw-hero h1 span { color: #ff7659; }
-.lw-hero p { max-width: 330px; margin: 10px 0 0; color: rgba(255,255,255,.82); font-size: 12px; line-height: 1.5; }
 .lw-version { position: absolute; top: 15px; right: 15px; padding: 5px 8px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; background: rgba(7,10,14,.56); color: rgba(255,255,255,.82); font-size: 9px; font-weight: 750; backdrop-filter: blur(12px); }
 
 .lw-content { display: flex; flex-direction: column; gap: 14px; padding: 16px; }

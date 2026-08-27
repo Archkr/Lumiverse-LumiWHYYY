@@ -63,7 +63,7 @@ function runtimeFor(overrides: Partial<RuntimeSnapshot> = {}): LumiWhyyyRuntime 
 
 describe("Dashboard", () => {
   it("renders the disarmed and missing-permission state", () => {
-    render(<Dashboard runtime={runtimeFor()} imageUrl="data:image/jpeg;base64,test" version="1.1.0" />);
+    render(<Dashboard runtime={runtimeFor()} imageUrl="data:image/jpeg;base64,test" version="1.0.0" />);
     expect(screen.getByText("Disarmed")).toBeTruthy();
     expect(screen.getByText("Overlay access required")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Grant access" })).toBeTruthy();
@@ -81,15 +81,15 @@ describe("Dashboard", () => {
         ready: false,
         visible: true,
       },
-    })} imageUrl="image" version="1.1.0" />);
+    })} imageUrl="image" version="1.0.0" />);
     expect(screen.getByText("Awaiting interaction")).toBeTruthy();
     expect(screen.getByText("Jumpscares armed")).toBeTruthy();
     expect(screen.queryByText("Overlay access required")).toBeNull();
   });
 
   it("advertises an unbounded positive interval and current version", () => {
-    render(<Dashboard runtime={runtimeFor()} imageUrl="image" version="1.1.0" />);
+    render(<Dashboard runtime={runtimeFor()} imageUrl="image" version="1.0.0" />);
     expect(screen.getByText(/Use any positive duration/)).toBeTruthy();
-    expect(screen.getByText("v1.1.0")).toBeTruthy();
+    expect(screen.getByText("v1.0.0")).toBeTruthy();
   });
 });

@@ -121,9 +121,7 @@ export function Dashboard({
         <img src={imageUrl} alt="Foxy" draggable={false} />
         <div class="lw-hero-shade" />
         <div class="lw-hero-copy">
-          <span class="lw-eyebrow">A deeply necessary extension</span>
           <h1>Lumi<span>WHYYY</span></h1>
-          <p>Recurring Foxy delivery, calibrated with alarming precision.</p>
         </div>
         <span class="lw-version">v{version}</span>
       </section>
