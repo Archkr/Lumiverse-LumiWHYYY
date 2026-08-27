@@ -3,8 +3,8 @@ import { JumpscareAudioController } from "./audio";
 import { JumpscarePresenter } from "./presenter";
 import { ForegroundScheduler, type SchedulerSnapshot } from "./scheduler";
 import {
-  convertIntervalUnit,
   intervalSeconds,
+  isPositiveFinite,
   normalizeSettings,
 } from "./settings";
 import {
@@ -121,18 +121,25 @@ export class LumiWhyyyRuntime {
   }
 
   async setIntervalValue(value: number): Promise<void> {
+    if (!isPositiveFinite(value)) {
+      this.notify("error", "The interval must be greater than zero.");
+      return;
+    }
     await this.patchSettings({
       intervalSeconds: intervalSeconds(value, this.snapshot.settings.intervalUnit),
     });
   }
 
   async setIntervalUnit(unit: IntervalUnit): Promise<void> {
-    const converted = convertIntervalUnit(this.snapshot.settings.intervalSeconds, unit);
-    await this.patchSettings({ intervalUnit: unit, intervalSeconds: converted.intervalSeconds });
+    await this.patchSettings({ intervalUnit: unit });
   }
 
   async setVolume(percent: number): Promise<void> {
     await this.patchSettings({ volume: Math.min(1, Math.max(0, percent / 100)) });
+  }
+
+  async setPlaybackRate(playbackRate: number): Promise<void> {
+    await this.patchSettings({ playbackRate });
   }
 
   async requestPanelPermission(): Promise<boolean> {
@@ -281,6 +288,8 @@ export class LumiWhyyyRuntime {
     const normalized = normalizeSettings(settings);
     const previous = this.snapshot.settings;
     this.audio.setVolume(normalized.volume);
+    this.audio.setPlaybackRate(normalized.playbackRate);
+    this.presenter?.setPlaybackRate(normalized.playbackRate);
     this.update({ settings: normalized });
     if (previous.intervalSeconds !== normalized.intervalSeconds) {
       this.scheduler.setIntervalMs(normalized.intervalSeconds * 1_000);
@@ -321,6 +330,7 @@ export class LumiWhyyyRuntime {
         this.imageUrl,
         (error) => this.notify("warning", `${error.message} Foxy still showed up.`),
       );
+      this.presenter.setPlaybackRate(this.snapshot.settings.playbackRate);
     } catch (error) {
       this.presenter = null;
       this.notify("error", error instanceof Error ? error.message : "Could not create the jumpscare overlay.");

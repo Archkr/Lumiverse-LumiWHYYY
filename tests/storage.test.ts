@@ -29,11 +29,12 @@ describe("LumiWhyyyRepository", () => {
     await Promise.all([
       repository.patchSettings("alpha", { intervalSeconds: 20 }, 10),
       repository.patchSettings("alpha", { volume: 0.4 }, 11),
+      repository.patchSettings("alpha", { playbackRate: 1.75 }, 12),
     ]);
     const settings = await repository.getSettings("alpha");
     expect(settings.intervalSeconds).toBe(20);
     expect(settings.volume).toBe(0.4);
-    expect(settings.revision).toBe(2);
+    expect(settings.playbackRate).toBe(1.75);
+    expect(settings.revision).toBe(3);
   });
 });
-

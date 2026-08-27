@@ -2,6 +2,8 @@ export interface AudioElementLike {
   src: string;
   preload: string;
   volume: number;
+  playbackRate: number;
+  defaultPlaybackRate: number;
   muted: boolean;
   currentTime: number;
   play(): Promise<void>;
@@ -16,6 +18,7 @@ export type AudioFactory = (source: string) => AudioElementLike;
 export class JumpscareAudioController {
   private readonly audio: AudioElementLike;
   private volume = 1;
+  private playbackRate = 1;
   private endedHandler: EventListener | null = null;
   private errorHandler: EventListener | null = null;
   private playing = false;
@@ -25,11 +28,19 @@ export class JumpscareAudioController {
     this.audio.src = source;
     this.audio.preload = "auto";
     this.audio.volume = this.volume;
+    this.audio.defaultPlaybackRate = this.playbackRate;
+    this.audio.playbackRate = this.playbackRate;
   }
 
   setVolume(volume: number): void {
     this.volume = Math.min(1, Math.max(0, volume));
     this.audio.volume = this.volume;
+  }
+
+  setPlaybackRate(playbackRate: number): void {
+    this.playbackRate = playbackRate;
+    this.audio.defaultPlaybackRate = playbackRate;
+    this.audio.playbackRate = playbackRate;
   }
 
   async unlock(): Promise<boolean> {
@@ -55,6 +66,7 @@ export class JumpscareAudioController {
     this.playing = true;
     this.audio.muted = false;
     this.audio.volume = this.volume;
+    this.audio.playbackRate = this.playbackRate;
     this.audio.currentTime = 0;
     this.endedHandler = () => {
       this.playing = false;
@@ -100,4 +112,3 @@ export class JumpscareAudioController {
     this.errorHandler = null;
   }
 }
-

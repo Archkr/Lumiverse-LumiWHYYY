@@ -18,6 +18,7 @@ export class JumpscarePresenter {
   private activeResolve: ((reason: JumpscareEndReason) => void) | null = null;
   private fallbackTimer: ReturnType<typeof setTimeout> | null = null;
   private previousFocus: HTMLElement | null = null;
+  private playbackRate = 1;
   private destroyed = false;
   private readonly keyHandler = (event: KeyboardEvent) => {
     if (event.key === "Escape") this.finish("dismissed", true);
@@ -51,6 +52,10 @@ export class JumpscarePresenter {
     return this.activeResolve !== null;
   }
 
+  setPlaybackRate(playbackRate: number): void {
+    this.playbackRate = playbackRate;
+  }
+
   present(): Promise<JumpscareEndReason> {
     if (this.destroyed) return Promise.resolve("destroyed");
     if (this.activeResolve) return Promise.resolve("dismissed");
@@ -68,7 +73,7 @@ export class JumpscarePresenter {
       this.activeResolve = resolve;
       this.fallbackTimer = setTimeout(
         () => this.finish("timeout", true),
-        this.durationMs + 750,
+        this.playbackDurationMs() + 750,
       );
       void this.audio.play(
         () => this.finish("ended", false),
@@ -77,7 +82,7 @@ export class JumpscarePresenter {
           if (this.fallbackTimer) clearTimeout(this.fallbackTimer);
           this.fallbackTimer = setTimeout(
             () => this.finish("timeout", false),
-            this.durationMs,
+            this.playbackDurationMs(),
           );
         },
       );
@@ -120,5 +125,9 @@ export class JumpscarePresenter {
     } catch {
       // A permission-gated placement can disappear before the frontend receives state.
     }
+  }
+
+  private playbackDurationMs(): number {
+    return this.durationMs / this.playbackRate;
   }
 }

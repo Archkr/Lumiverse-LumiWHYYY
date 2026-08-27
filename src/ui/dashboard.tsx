@@ -2,8 +2,7 @@ import type { ComponentChildren } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import type { LumiWhyyyRuntime, RuntimeSnapshot } from "../runtime";
 import { INTERVAL_UNIT_SPECS, intervalValue, isIntervalUnit } from "../settings";
-import type { IntervalUnit } from "../types";
-import { HostNumber, HostSwitch, HostUnitSelect, HostVolume } from "./host-controls";
+import { HostNumber, HostSpeed, HostSwitch, HostUnitSelect, HostVolume } from "./host-controls";
 import { Icon } from "./icons";
 
 export interface StatusPresentation {
@@ -95,19 +94,14 @@ function Notice({ notice }: { notice: RuntimeSnapshot["notice"] }) {
   );
 }
 
-function intervalHelp(unit: IntervalUnit): string {
-  const spec = INTERVAL_UNIT_SPECS[unit];
-  if (unit === "seconds") return `${spec.min.toLocaleString()}–${spec.max.toLocaleString()} seconds`;
-  if (unit === "minutes") return `${spec.min.toLocaleString()}–${spec.max.toLocaleString()} minutes`;
-  return "15 minutes–24 hours";
-}
-
 export function Dashboard({
   runtime,
   imageUrl,
+  version,
 }: {
   runtime: LumiWhyyyRuntime;
   imageUrl: string;
+  version: string;
 }) {
   const state = useRuntime(runtime);
   const status = statusPresentation(state);
@@ -117,7 +111,8 @@ export function Dashboard({
   const ratio = state.scheduler.intervalMs > 0
     ? Math.min(1, Math.max(0, 1 - state.scheduler.remainingMs / state.scheduler.intervalMs))
     : 0;
-  const progress = `${Math.round(ratio * 100)}%`;
+  const ringLength = 2 * Math.PI * 42;
+  const ringOffset = ringLength * (1 - ratio);
   const run = (operation: Promise<unknown>) => void operation.catch(() => undefined);
 
   return (
@@ -130,14 +125,25 @@ export function Dashboard({
           <h1>Lumi<span>WHYYY</span></h1>
           <p>Recurring Foxy delivery, calibrated with alarming precision.</p>
         </div>
-        <span class="lw-version">v1.0.0</span>
+        <span class="lw-version">v{version}</span>
       </section>
 
       <div class="lw-content">
         <Notice notice={state.notice} />
 
         <section class="lw-status-card" data-tone={status.tone}>
-          <div class="lw-countdown" style={{ "--lw-progress": progress }}>
+          <div class="lw-countdown">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="lw-ring-track" cx="50" cy="50" r="42" />
+              <circle
+                class="lw-ring-value"
+                cx="50"
+                cy="50"
+                r="42"
+                stroke-dasharray={ringLength}
+                stroke-dashoffset={ringOffset}
+              />
+            </svg>
             <div>
               <span>{state.settings.enabled && state.gestureSeen && state.permissions.uiPanels ? formatCountdown(state.scheduler.remainingMs) : "--:--"}</span>
               <small>next visit</small>
@@ -207,8 +213,6 @@ export function Dashboard({
             <HostNumber
               ctx={runtime.ctx}
               value={value}
-              min={spec.min}
-              max={spec.max}
               step={spec.step}
               disabled={!state.connected || state.saving}
               onChange={(next) => run(runtime.setIntervalValue(next))}
@@ -222,7 +226,7 @@ export function Dashboard({
               }}
             />
           </div>
-          <p class="lw-field-help">Allowed range: {intervalHelp(unit)}. Hidden-tab time never counts.</p>
+          <p class="lw-field-help">Use any positive duration. Time spent in a hidden tab never counts.</p>
         </section>
 
         <section class="lw-panel">
@@ -230,15 +234,23 @@ export function Dashboard({
             <div class="lw-title-icon"><Icon name="sound" size={18} /></div>
             <div>
               <h2>Impact</h2>
-              <p>The provided 4.92-second MP3 plays locally at this level.</p>
+              <p>Tune the volume and velocity of Foxy’s arrival.</p>
             </div>
           </div>
-          <HostVolume
-            ctx={runtime.ctx}
-            value={Math.round(state.settings.volume * 100)}
-            disabled={!state.connected || state.saving}
-            onChange={(next) => run(runtime.setVolume(next))}
-          />
+          <div class="lw-impact-controls">
+            <HostVolume
+              ctx={runtime.ctx}
+              value={Math.round(state.settings.volume * 100)}
+              disabled={!state.connected || state.saving}
+              onChange={(next) => run(runtime.setVolume(next))}
+            />
+            <HostSpeed
+              ctx={runtime.ctx}
+              value={state.settings.playbackRate}
+              disabled={!state.connected || state.saving}
+              onChange={(next) => run(runtime.setPlaybackRate(next))}
+            />
+          </div>
           <div class="lw-test-row">
             <div>
               <strong>Quality assurance</strong>

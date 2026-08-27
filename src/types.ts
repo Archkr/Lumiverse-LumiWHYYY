@@ -1,8 +1,8 @@
 export const LUMI_WHYYY_ID = "lumi_whyyy" as const;
 export const SCHEMA_VERSION = 1 as const;
-export const MIN_INTERVAL_SECONDS = 10;
-export const MAX_INTERVAL_SECONDS = 24 * 60 * 60;
 export const JUMPSCARE_DURATION_MS = 4_923;
+export const MIN_PLAYBACK_RATE = 0.25;
+export const MAX_PLAYBACK_RATE = 4;
 
 export type IntervalUnit = "seconds" | "minutes" | "hours";
 
@@ -13,12 +13,13 @@ export interface LumiWhyyySettingsV1 {
   intervalSeconds: number;
   intervalUnit: IntervalUnit;
   volume: number;
+  playbackRate: number;
   updatedAt: number;
 }
 
 export type LumiWhyyySettingsPatch = Partial<Pick<
   LumiWhyyySettingsV1,
-  "enabled" | "intervalSeconds" | "intervalUnit" | "volume"
+  "enabled" | "intervalSeconds" | "intervalUnit" | "volume" | "playbackRate"
 >>;
 
 export interface PermissionState {
@@ -46,6 +47,6 @@ export const DEFAULT_SETTINGS: LumiWhyyySettingsV1 = {
   intervalSeconds: 15 * 60,
   intervalUnit: "minutes",
   volume: 1,
+  playbackRate: 1,
   updatedAt: 0,
 };
-

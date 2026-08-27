@@ -64,6 +64,19 @@ describe("JumpscarePresenter", () => {
     expect(widget.visible).toBe(false);
   });
 
+  it("adjusts the failed-audio fallback to playback speed", async () => {
+    const widget = new FakeWidget();
+    const audio = new FakePresenterAudio();
+    const presenter = new JumpscarePresenter(widget, audio, "image", vi.fn(), 1_000);
+    presenter.setPlaybackRate(2);
+    const result = presenter.present();
+    audio.failed?.(new Error("blocked"));
+    vi.advanceTimersByTime(499);
+    expect(widget.visible).toBe(true);
+    vi.advanceTimersByTime(1);
+    await expect(result).resolves.toBe("timeout");
+  });
+
   it("resolves an active presentation during teardown", async () => {
     const widget = new FakeWidget();
     const presenter = new JumpscarePresenter(widget, new FakePresenterAudio(), "image", vi.fn(), 1_000);
@@ -73,4 +86,3 @@ describe("JumpscarePresenter", () => {
     expect(widget.destroyed).toBe(true);
   });
 });
-

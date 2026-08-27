@@ -20,7 +20,7 @@ export function setup(ctx: SpindleFrontendContext): () => void {
     iconSvg: LUMI_WHYYY_ICON,
   });
   const runtime = new LumiWhyyyRuntime(ctx, jumpscareImage, jumpscareAudio);
-  render(<Dashboard runtime={runtime} imageUrl={jumpscareImage} />, drawer.root);
+  render(<Dashboard runtime={runtime} imageUrl={jumpscareImage} version={ctx.manifest.version} />, drawer.root);
   runtime.start();
   ctx.ready();
 
@@ -31,4 +31,3 @@ export function setup(ctx: SpindleFrontendContext): () => void {
     removeStyle();
   };
 }
-

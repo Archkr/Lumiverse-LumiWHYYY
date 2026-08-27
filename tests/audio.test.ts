@@ -5,6 +5,8 @@ class FakeAudio extends EventTarget implements AudioElementLike {
   src = "";
   preload = "";
   volume = 1;
+  playbackRate = 1;
+  defaultPlaybackRate = 1;
   muted = false;
   currentTime = 0;
   rejectNext = false;
@@ -58,5 +60,14 @@ describe("JumpscareAudioController", () => {
     audio.setVolume(0.2);
     expect(element.volume).toBe(0.2);
   });
-});
 
+  it("applies playback speed to current and future playback", async () => {
+    const element = new FakeAudio();
+    const audio = new JumpscareAudioController("sound", () => element);
+    audio.setPlaybackRate(1.75);
+    expect(element.playbackRate).toBe(1.75);
+    expect(element.defaultPlaybackRate).toBe(1.75);
+    await audio.play(() => undefined, () => undefined);
+    expect(element.playbackRate).toBe(1.75);
+  });
+});

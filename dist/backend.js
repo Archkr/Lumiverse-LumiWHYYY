@@ -1,7 +1,7 @@
 // src/types.ts
 var SCHEMA_VERSION = 1;
-var MIN_INTERVAL_SECONDS = 10;
-var MAX_INTERVAL_SECONDS = 24 * 60 * 60;
+var MIN_PLAYBACK_RATE = 0.25;
+var MAX_PLAYBACK_RATE = 4;
 var DEFAULT_SETTINGS = {
   schemaVersion: SCHEMA_VERSION,
   revision: 0,
@@ -9,6 +9,7 @@ var DEFAULT_SETTINGS = {
   intervalSeconds: 15 * 60,
   intervalUnit: "minutes",
   volume: 1,
+  playbackRate: 1,
   updatedAt: 0
 };
 
@@ -19,8 +20,8 @@ function asRecord(value) {
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
-function clampIntervalSeconds(value) {
-  return Math.round(clamp(value, MIN_INTERVAL_SECONDS, MAX_INTERVAL_SECONDS));
+function isPositiveFinite(value) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 function isIntervalUnit(value) {
   return value === "seconds" || value === "minutes" || value === "hours";
@@ -31,9 +32,10 @@ function normalizeSettings(raw) {
     schemaVersion: SCHEMA_VERSION,
     revision: typeof source.revision === "number" && Number.isFinite(source.revision) ? Math.max(0, Math.trunc(source.revision)) : DEFAULT_SETTINGS.revision,
     enabled: typeof source.enabled === "boolean" ? source.enabled : DEFAULT_SETTINGS.enabled,
-    intervalSeconds: typeof source.intervalSeconds === "number" && Number.isFinite(source.intervalSeconds) ? clampIntervalSeconds(source.intervalSeconds) : DEFAULT_SETTINGS.intervalSeconds,
+    intervalSeconds: isPositiveFinite(source.intervalSeconds) ? source.intervalSeconds : DEFAULT_SETTINGS.intervalSeconds,
     intervalUnit: isIntervalUnit(source.intervalUnit) ? source.intervalUnit : DEFAULT_SETTINGS.intervalUnit,
     volume: typeof source.volume === "number" && Number.isFinite(source.volume) ? clamp(source.volume, 0, 1) : DEFAULT_SETTINGS.volume,
+    playbackRate: typeof source.playbackRate === "number" && Number.isFinite(source.playbackRate) ? clamp(source.playbackRate, MIN_PLAYBACK_RATE, MAX_PLAYBACK_RATE) : DEFAULT_SETTINGS.playbackRate,
     updatedAt: typeof source.updatedAt === "number" && Number.isFinite(source.updatedAt) ? Math.max(0, Math.trunc(source.updatedAt)) : DEFAULT_SETTINGS.updatedAt
   };
 }
@@ -45,10 +47,10 @@ function parseSettingsPatch(raw) {
     patch.enabled = source.enabled;
   }
   if ("intervalSeconds" in source) {
-    if (typeof source.intervalSeconds !== "number" || !Number.isFinite(source.intervalSeconds)) {
-      throw new Error("Interval must be a finite number of seconds.");
+    if (!isPositiveFinite(source.intervalSeconds)) {
+      throw new Error("Interval must be a finite number greater than zero.");
     }
-    patch.intervalSeconds = clampIntervalSeconds(source.intervalSeconds);
+    patch.intervalSeconds = source.intervalSeconds;
   }
   if ("intervalUnit" in source) {
     if (!isIntervalUnit(source.intervalUnit)) throw new Error("Interval unit is not supported.");
@@ -59,6 +61,12 @@ function parseSettingsPatch(raw) {
       throw new Error("Volume must be a finite number.");
     }
     patch.volume = clamp(source.volume, 0, 1);
+  }
+  if ("playbackRate" in source) {
+    if (typeof source.playbackRate !== "number" || !Number.isFinite(source.playbackRate)) {
+      throw new Error("Playback speed must be a finite number.");
+    }
+    patch.playbackRate = clamp(source.playbackRate, MIN_PLAYBACK_RATE, MAX_PLAYBACK_RATE);
   }
   if (Object.keys(patch).length === 0) throw new Error("No supported settings were supplied.");
   return patch;

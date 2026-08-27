@@ -4,7 +4,7 @@
 
 **A recurring Foxy jumpscare for Lumiverse. Because apparently this was necessary.**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-e75b3d)](./spindle.json)
+[![Version](https://img.shields.io/badge/version-1.1.0-e75b3d)](./spindle.json)
 [![Lumiverse](https://img.shields.io/badge/Lumiverse-%E2%89%A5%201.1.0-d4a35a)](https://github.com/prolix-oc/Lumiverse)
 [![Permission](https://img.shields.io/badge/permission-ui__panels-6f9f78)](./spindle.json)
 
@@ -14,10 +14,10 @@ LumiWHYYY does one thing: after a configurable amount of visible Lumiverse time,
 
 ## Features
 
-- Fixed interval from 10 seconds through 24 hours
+- Any positive finite interval, with no arbitrary maximum
 - Seconds, minutes, and hours controls
 - Fullscreen, cover-fitted Foxy image
-- Bundled 4.92-second MP3 with a 0–100% volume control
+- Bundled 4.92-second MP3 with volume and 0.25×–4× playback-speed controls
 - Countdown that pauses while the Lumiverse tab is hidden
 - Click or `Escape` to dismiss immediately
 - A test button that does not arm recurring scares
@@ -41,7 +41,8 @@ Fresh installs are disarmed. Arming or testing provides the user gesture browser
 - A hidden tab preserves its remaining countdown instead of catching up on return.
 - The next full interval starts after the audio ends or the overlay is dismissed.
 - Revoking `ui_panels` removes the overlay and pauses the scheduler while leaving the saved armed setting intact.
-- If audio playback fails, Foxy still appears for approximately the MP3 duration and the drawer reports the problem.
+- Playback speed changes the current and future scare without altering the countdown interval.
+- If audio playback fails, Foxy still appears for approximately the speed-adjusted MP3 duration and the drawer reports the problem.
 
 ## Permission
 
@@ -79,4 +80,3 @@ scripts/              Deterministic production build checks
 ## License
 
 LumiWHYYY uses the Lumiverse Community License 2.0. See [LICENSE.md](./LICENSE.md).
-

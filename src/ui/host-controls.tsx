@@ -43,8 +43,6 @@ export function HostSwitch(props: {
 export function HostNumber(props: {
   ctx: SpindleFrontendContext;
   value: number;
-  min: number;
-  max: number;
   step: number;
   disabled?: boolean;
   onChange(value: number): void;
@@ -57,8 +55,6 @@ export function HostNumber(props: {
     if (!root.current) return;
     handle.current = props.ctx.components.mountNumberStepper(root.current, {
       value: props.value,
-      min: props.min,
-      max: props.max,
       step: props.step,
       disabled: props.disabled,
       onChange: (value) => {
@@ -72,11 +68,9 @@ export function HostNumber(props: {
   }, [props.ctx]);
   useEffect(() => handle.current?.update({
     value: props.value,
-    min: props.min,
-    max: props.max,
     step: props.step,
     disabled: props.disabled,
-  }), [props.value, props.min, props.max, props.step, props.disabled]);
+  }), [props.value, props.step, props.disabled]);
   return <div class="lw-host-control" ref={root} />;
 }
 
@@ -153,3 +147,37 @@ export function HostVolume(props: {
   return <div class="lw-host-control lw-volume" ref={root} />;
 }
 
+export function HostSpeed(props: {
+  ctx: SpindleFrontendContext;
+  value: number;
+  disabled?: boolean;
+  onChange(value: number): void;
+}) {
+  const root = useRef<HTMLDivElement>(null);
+  const handle = useRef<SpindleRangeSliderHandle | null>(null);
+  const latest = useRef(props);
+  latest.current = props;
+  useEffect(() => {
+    if (!root.current) return;
+    handle.current = props.ctx.components.mountRangeSlider(root.current, {
+      label: "Playback speed",
+      hint: "Changes the pitch and duration of current and future scares.",
+      value: props.value,
+      min: 0.25,
+      max: 4,
+      step: 0.25,
+      format: { decimals: 2, suffix: "×" },
+      disabled: props.disabled,
+      onCommit: (value) => latest.current.onChange(value),
+    });
+    return () => {
+      handle.current?.destroy();
+      handle.current = null;
+    };
+  }, [props.ctx]);
+  useEffect(() => handle.current?.update({
+    value: props.value,
+    disabled: props.disabled,
+  }), [props.value, props.disabled]);
+  return <div class="lw-host-control lw-speed" ref={root} />;
+}
