@@ -2,7 +2,7 @@
 
 # LumiWHYYY
 
-**A recurring Foxy jumpscare for Lumiverse. Because apparently this was necessary.**
+**Configurable scheduled fullscreen jumpscares for Lumiverse.**
 
 [![Version](https://img.shields.io/badge/version-1.0.0-e75b3d)](./spindle.json)
 [![Lumiverse](https://img.shields.io/badge/Lumiverse-%E2%89%A5%201.1.0-d4a35a)](https://github.com/prolix-oc/Lumiverse)
@@ -10,7 +10,7 @@
 
 </div>
 
-LumiWHYYY does one thing: after a configurable amount of visible Lumiverse time, it fills the viewport with Foxy and plays the bundled jumpscare sound. Then it starts another full countdown.
+LumiWHYYY displays a fullscreen image and plays bundled audio after a configurable amount of visible Lumiverse time. A new countdown begins after each playback.
 
 ## Features
 
@@ -31,18 +31,18 @@ LumiWHYYY does one thing: after a configurable amount of visible Lumiverse time,
 2. Install `https://github.com/Archkr/Lumiverse-LumiWHYYY`.
 3. Enable the extension and grant its `ui_panels` permission.
 4. Open **LumiWHYYY** from the drawer or command palette.
-5. Choose an interval, test the scare, and arm it when ready.
+5. Choose an interval, run a preview, and enable recurring playback.
 
-Fresh installs are disarmed. Arming or testing provides the user gesture browsers require before timed audio can play. When an armed setting is restored after a reload, the countdown waits for the first click or keypress in that session, then starts from the full configured interval.
+Recurring playback is disabled on fresh installations. Enabling it or running a preview provides the user gesture browsers require before timed audio can play. After a reload, an enabled schedule waits for the first click or keypress in that session, then starts from the full configured interval.
 
 ## Behavior
 
 - Only time spent with Lumiverse visible counts toward the next scare.
 - A hidden tab preserves its remaining countdown instead of catching up on return.
 - The next full interval starts after the audio ends or the overlay is dismissed.
-- Revoking `ui_panels` removes the overlay and pauses the scheduler while leaving the saved armed setting intact.
+- Revoking `ui_panels` removes the overlay and pauses the scheduler while preserving the enabled setting.
 - Playback speed changes the current and future scare without altering the countdown interval.
-- If audio playback fails, Foxy still appears for approximately the speed-adjusted MP3 duration and the drawer reports the problem.
+- If audio playback fails, the fullscreen image remains visible for approximately the speed-adjusted MP3 duration and the drawer reports the problem.
 
 ## Permission
 

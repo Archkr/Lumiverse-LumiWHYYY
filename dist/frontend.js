@@ -364,14 +364,14 @@ var JumpscarePresenter = class {
     this.overlay = document.createElement("button");
     this.overlay.type = "button";
     this.overlay.className = "lw-jumpscare";
-    this.overlay.setAttribute("aria-label", "Foxy jumpscare. Click or press Escape to dismiss.");
+    this.overlay.setAttribute("aria-label", "Fullscreen jumpscare. Click or press Escape to dismiss.");
     const image = document.createElement("img");
     image.src = imageUrl;
-    image.alt = "Foxy lunging toward the viewer";
+    image.alt = "Fullscreen jumpscare image";
     image.draggable = false;
     const hint = document.createElement("span");
     hint.className = "lw-jumpscare-hint";
-    hint.textContent = "Click or press Esc to dismiss";
+    hint.textContent = "Click or press Esc to close";
     this.overlay.append(image, hint);
     this.overlay.addEventListener("click", () => this.finish("dismissed", true));
     this.widget.root.replaceChildren(this.overlay);
@@ -631,7 +631,7 @@ var DEFAULT_SETTINGS = {
 
 // src/settings.ts
 var INTERVAL_UNIT_SPECS = {
-  seconds: { factor: 1, step: 1, decimals: 3, suffix: " sec" },
+  seconds: { factor: 1, step: 0.1, decimals: 3, suffix: " sec" },
   minutes: { factor: 60, step: 0.1, decimals: 4, suffix: " min" },
   hours: { factor: 3600, step: 0.01, decimals: 6, suffix: " hr" }
 };
@@ -745,7 +745,7 @@ var LumiWhyyyRuntime = class {
       if (!granted) return;
     }
     await this.patchSettings({ enabled });
-    this.notify(enabled ? "success" : "info", enabled ? "LumiWHYYY is armed." : "LumiWHYYY is disarmed.");
+    this.notify(enabled ? "success" : "info", enabled ? "Recurring playback enabled." : "Recurring playback disabled.");
   }
   async setIntervalValue(value) {
     if (!isPositiveFinite(value)) {
@@ -774,7 +774,7 @@ var LumiWhyyyRuntime = class {
     this.ensurePresenter();
     if (!this.presenter) return;
     if (!this.scheduler.triggerNow()) {
-      this.notify("info", "Foxy is already on screen.");
+      this.notify("info", "A jumpscare is already active.");
     }
   }
   dismissScare() {
@@ -833,7 +833,7 @@ var LumiWhyyyRuntime = class {
     if (this.snapshot.permissions.uiPanels) return true;
     try {
       const granted = await this.ctx.permissions.request(["ui_panels"], {
-        reason: "LumiWHYYY needs an overlay surface to display the fullscreen Foxy jumpscare."
+        reason: "LumiWHYYY requires overlay access to display fullscreen jumpscares."
       });
       const uiPanels = granted.includes("ui_panels");
       this.applyPermission(uiPanels);
@@ -937,7 +937,7 @@ var LumiWhyyyRuntime = class {
         widget,
         this.audio,
         this.imageUrl,
-        (error) => this.notify("warning", `${error.message} Foxy still showed up.`)
+        (error) => this.notify("warning", `${error.message} The image remained visible.`)
       );
     } catch (error) {
       this.presenter = null;
@@ -1235,7 +1235,7 @@ function HostVolume(props) {
     if (!root.current) return;
     handle.current = props.ctx.components.mountRangeSlider(root.current, {
       label: "Volume",
-      hint: "Applied immediately to the supplied MP3.",
+      hint: "Changes apply immediately.",
       value: props.value,
       min: 0,
       max: 100,
@@ -1265,7 +1265,7 @@ function HostSpeed(props) {
     if (!root.current) return;
     handle.current = props.ctx.components.mountRangeSlider(root.current, {
       label: "Playback speed",
-      hint: "Changes the pitch and duration of current and future scares.",
+      hint: "Controls playback rate and effective duration.",
       value: props.value,
       min: 0.25,
       max: 4,
@@ -1330,37 +1330,37 @@ var LUMI_WHYYY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 function statusPresentation(state) {
   if (!state.connected) return {
     label: "Connecting",
-    detail: "Waiting for the LumiWHYYY backend.",
+    detail: "Connecting to extension services.",
     tone: "neutral"
   };
   if (!state.settings.enabled) return {
-    label: "Disarmed",
-    detail: "Foxy is safely contained. For now.",
+    label: "Disabled",
+    detail: "Recurring jumpscares are turned off.",
     tone: "neutral"
   };
   if (!state.permissions.uiPanels) return {
-    label: "Needs access",
-    detail: "Grant overlay access before the countdown can begin.",
+    label: "Permission required",
+    detail: "Grant overlay access to enable fullscreen playback.",
     tone: "warning"
   };
   if (!state.gestureSeen) return {
-    label: "Awaiting interaction",
-    detail: "Click or press a key once so the browser can unlock sound.",
+    label: "Interaction required",
+    detail: "Interact with Lumiverse once to enable browser audio.",
     tone: "warning"
   };
   if (state.scheduler.status === "scaring") return {
-    label: "FOXY",
-    detail: "Well. There he is.",
+    label: "Playing",
+    detail: "A jumpscare is currently active.",
     tone: "danger"
   };
   if (state.scheduler.status === "paused") return {
     label: "Paused",
-    detail: "The countdown waits while Lumiverse is hidden.",
+    detail: "The countdown is paused while Lumiverse is hidden.",
     tone: "neutral"
   };
   return {
-    label: "Armed",
-    detail: "The countdown advances only while this page is visible.",
+    label: "Scheduled",
+    detail: "The countdown advances while Lumiverse is visible.",
     tone: "accent"
   };
 }
@@ -1446,7 +1446,7 @@ function Dashboard({
           ] }),
           /* @__PURE__ */ u3("div", { children: [
             /* @__PURE__ */ u3("span", { children: state.settings.enabled && state.gestureSeen && state.permissions.uiPanels ? formatCountdown(state.scheduler.remainingMs) : "--:--" }),
-            /* @__PURE__ */ u3("small", { children: "next visit" })
+            /* @__PURE__ */ u3("small", { children: "next playback" })
           ] })
         ] }),
         /* @__PURE__ */ u3("div", { class: "lw-status-copy", children: [
@@ -1455,17 +1455,17 @@ function Dashboard({
             status.label
           ] }),
           /* @__PURE__ */ u3("strong", { children: status.detail }),
-          /* @__PURE__ */ u3("small", { children: state.lastScareAt ? `Last appearance ${new Date(state.lastScareAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}` : "No appearances this session" })
+          /* @__PURE__ */ u3("small", { children: state.lastScareAt ? `Last playback ${new Date(state.lastScareAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}` : "No playback this session" })
         ] })
       ] }),
       !state.permissions.uiPanels && state.connected && /* @__PURE__ */ u3("section", { class: "lw-permission-card", children: [
         /* @__PURE__ */ u3("div", { class: "lw-permission-icon", children: /* @__PURE__ */ u3(Icon, { name: "shield", size: 19 }) }),
         /* @__PURE__ */ u3("div", { children: [
-          /* @__PURE__ */ u3("strong", { children: "Overlay access required" }),
+          /* @__PURE__ */ u3("strong", { children: "Overlay permission required" }),
           /* @__PURE__ */ u3("p", { children: [
-            "Lumiverse uses the ",
+            "The ",
             /* @__PURE__ */ u3("code", { children: "ui_panels" }),
-            " permission for the fullscreen scare surface."
+            " permission is required to display the fullscreen image."
           ] })
         ] }),
         /* @__PURE__ */ u3(
@@ -1482,14 +1482,14 @@ function Dashboard({
         /* @__PURE__ */ u3("div", { class: "lw-panel-title", children: [
           /* @__PURE__ */ u3("div", { class: "lw-title-icon", children: /* @__PURE__ */ u3(Icon, { name: "fox", size: 18 }) }),
           /* @__PURE__ */ u3("div", { children: [
-            /* @__PURE__ */ u3("h2", { children: "Containment controls" }),
-            /* @__PURE__ */ u3("p", { children: "Arming is remembered. Each reload begins with a fresh countdown." })
+            /* @__PURE__ */ u3("h2", { children: "Schedule" }),
+            /* @__PURE__ */ u3("p", { children: "Enable recurring playback. This setting persists across reloads." })
           ] })
         ] }),
         /* @__PURE__ */ u3("div", { class: "lw-arm-row", children: [
           /* @__PURE__ */ u3("div", { children: [
-            /* @__PURE__ */ u3("strong", { children: state.settings.enabled ? "Jumpscares armed" : "Jumpscares disarmed" }),
-            /* @__PURE__ */ u3("span", { children: state.settings.enabled ? "Foxy has been released into the scheduler." : "Nothing terrible is currently scheduled." })
+            /* @__PURE__ */ u3("strong", { children: "Recurring playback" }),
+            /* @__PURE__ */ u3("span", { children: state.settings.enabled ? "Enabled" : "Disabled" })
           ] }),
           /* @__PURE__ */ u3(
             HostSwitch,
@@ -1497,7 +1497,7 @@ function Dashboard({
               ctx: runtime.ctx,
               checked: state.settings.enabled,
               disabled: !state.connected || state.saving,
-              label: "Arm recurring jumpscares",
+              label: "Enable recurring jumpscares",
               onChange: (enabled) => run(runtime.setEnabled(enabled))
             }
           )
@@ -1507,11 +1507,11 @@ function Dashboard({
         /* @__PURE__ */ u3("div", { class: "lw-panel-title", children: [
           /* @__PURE__ */ u3("div", { class: "lw-title-icon", children: /* @__PURE__ */ u3(Icon, { name: "clock", size: 18 }) }),
           /* @__PURE__ */ u3("div", { children: [
-            /* @__PURE__ */ u3("h2", { children: "Timing" }),
-            /* @__PURE__ */ u3("p", { children: "A full quiet interval begins after Foxy leaves the screen." })
+            /* @__PURE__ */ u3("h2", { children: "Interval" }),
+            /* @__PURE__ */ u3("p", { children: "A new interval starts after playback or dismissal." })
           ] })
         ] }),
-        /* @__PURE__ */ u3("label", { class: "lw-field-label", children: "Scare every" }),
+        /* @__PURE__ */ u3("label", { class: "lw-field-label", children: "Playback interval" }),
         /* @__PURE__ */ u3("div", { class: "lw-interval-grid", children: [
           /* @__PURE__ */ u3(
             HostNumber,
@@ -1535,14 +1535,14 @@ function Dashboard({
             }
           )
         ] }),
-        /* @__PURE__ */ u3("p", { class: "lw-field-help", children: "Use any positive duration. Time spent in a hidden tab never counts." })
+        /* @__PURE__ */ u3("p", { class: "lw-field-help", children: "Enter any positive duration. The countdown pauses while Lumiverse is hidden." })
       ] }),
       /* @__PURE__ */ u3("section", { class: "lw-panel", children: [
         /* @__PURE__ */ u3("div", { class: "lw-panel-title", children: [
           /* @__PURE__ */ u3("div", { class: "lw-title-icon", children: /* @__PURE__ */ u3(Icon, { name: "sound", size: 18 }) }),
           /* @__PURE__ */ u3("div", { children: [
-            /* @__PURE__ */ u3("h2", { children: "Impact" }),
-            /* @__PURE__ */ u3("p", { children: "Tune the volume and velocity of Foxy’s arrival." })
+            /* @__PURE__ */ u3("h2", { children: "Audio" }),
+            /* @__PURE__ */ u3("p", { children: "Configure the jumpscare audio output." })
           ] })
         ] }),
         /* @__PURE__ */ u3("div", { class: "lw-impact-controls", children: [
@@ -1567,8 +1567,8 @@ function Dashboard({
         ] }),
         /* @__PURE__ */ u3("div", { class: "lw-test-row", children: [
           /* @__PURE__ */ u3("div", { children: [
-            /* @__PURE__ */ u3("strong", { children: "Quality assurance" }),
-            /* @__PURE__ */ u3("span", { children: "Does not arm the recurring timer by itself." })
+            /* @__PURE__ */ u3("strong", { children: "Preview" }),
+            /* @__PURE__ */ u3("span", { children: "Runs once without changing the recurring schedule." })
           ] }),
           /* @__PURE__ */ u3(
             Button,
@@ -1576,7 +1576,7 @@ function Dashboard({
               icon: "play",
               disabled: !state.connected || state.scheduler.status === "scaring",
               onClick: () => run(runtime.testScare()),
-              children: "Test jumpscare"
+              children: "Run preview"
             }
           )
         ] })
@@ -1584,7 +1584,7 @@ function Dashboard({
       /* @__PURE__ */ u3("footer", { class: "lw-footer", children: [
         /* @__PURE__ */ u3("span", { children: [
           /* @__PURE__ */ u3("i", {}),
-          " Local media only"
+          " Bundled media"
         ] }),
         /* @__PURE__ */ u3("span", { children: state.saving ? "Saving…" : state.connected ? "Settings synced" : "Connecting…" })
       ] })
@@ -1820,7 +1820,7 @@ function setup(ctx) {
     title: "LumiWHYYY",
     shortName: "WHYYY",
     headerTitle: "LumiWHYYY",
-    description: "Configure a recurring fullscreen Foxy jumpscare.",
+    description: "Configure scheduled fullscreen jumpscares.",
     keywords: ["foxy", "jumpscare", "timer", "why", "fnaf"],
     iconSvg: LUMI_WHYYY_ICON
   });

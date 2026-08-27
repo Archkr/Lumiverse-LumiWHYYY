@@ -31,14 +31,14 @@ export class JumpscarePresenter {
     this.overlay = document.createElement("button");
     this.overlay.type = "button";
     this.overlay.className = "lw-jumpscare";
-    this.overlay.setAttribute("aria-label", "Foxy jumpscare. Click or press Escape to dismiss.");
+    this.overlay.setAttribute("aria-label", "Fullscreen jumpscare. Click or press Escape to dismiss.");
     const image = document.createElement("img");
     image.src = imageUrl;
-    image.alt = "Foxy lunging toward the viewer";
+    image.alt = "Fullscreen jumpscare image";
     image.draggable = false;
     const hint = document.createElement("span");
     hint.className = "lw-jumpscare-hint";
-    hint.textContent = "Click or press Esc to dismiss";
+    hint.textContent = "Click or press Esc to close";
     this.overlay.append(image, hint);
     this.overlay.addEventListener("click", () => this.finish("dismissed", true));
     this.widget.root.replaceChildren(this.overlay);

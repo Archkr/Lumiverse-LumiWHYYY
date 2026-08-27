@@ -5,7 +5,7 @@
   "author": "Archkr",
   "github": "https://github.com/Archkr/Lumiverse-LumiWHYYY",
   "homepage": "https://github.com/Archkr/Lumiverse-LumiWHYYY",
-  "description": "A configurable recurring Foxy jumpscare. Because apparently Lumiverse needed this.",
+  "description": "Configurable scheduled fullscreen jumpscares for Lumiverse.",
   "permissions": ["ui_panels"],
   "entry_backend": "dist/backend.js",
   "entry_frontend": "dist/frontend.js",

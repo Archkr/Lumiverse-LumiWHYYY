@@ -15,7 +15,7 @@ export function setup(ctx: SpindleFrontendContext): () => void {
     title: "LumiWHYYY",
     shortName: "WHYYY",
     headerTitle: "LumiWHYYY",
-    description: "Configure a recurring fullscreen Foxy jumpscare.",
+    description: "Configure scheduled fullscreen jumpscares.",
     keywords: ["foxy", "jumpscare", "timer", "why", "fnaf"],
     iconSvg: LUMI_WHYYY_ICON,
   });

@@ -64,8 +64,8 @@ function runtimeFor(overrides: Partial<RuntimeSnapshot> = {}): LumiWhyyyRuntime 
 describe("Dashboard", () => {
   it("renders the disarmed and missing-permission state", () => {
     render(<Dashboard runtime={runtimeFor()} imageUrl="data:image/jpeg;base64,test" version="1.0.0" />);
-    expect(screen.getByText("Disarmed")).toBeTruthy();
-    expect(screen.getByText("Overlay access required")).toBeTruthy();
+    expect(screen.getByText("Recurring jumpscares are turned off.")).toBeTruthy();
+    expect(screen.getByText("Overlay permission required")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Grant access" })).toBeTruthy();
   });
 
@@ -82,14 +82,19 @@ describe("Dashboard", () => {
         visible: true,
       },
     })} imageUrl="image" version="1.0.0" />);
-    expect(screen.getByText("Awaiting interaction")).toBeTruthy();
-    expect(screen.getByText("Jumpscares armed")).toBeTruthy();
-    expect(screen.queryByText("Overlay access required")).toBeNull();
+    expect(screen.getByText("Interaction required")).toBeTruthy();
+    expect(screen.getByText("Recurring playback")).toBeTruthy();
+    expect(screen.queryByText("Overlay permission required")).toBeNull();
   });
 
   it("advertises an unbounded positive interval and current version", () => {
-    render(<Dashboard runtime={runtimeFor()} imageUrl="image" version="1.0.0" />);
-    expect(screen.getByText(/Use any positive duration/)).toBeTruthy();
+    const runtime = runtimeFor();
+    render(<Dashboard runtime={runtime} imageUrl="image" version="1.0.0" />);
+    expect(screen.getByText(/Enter any positive duration/)).toBeTruthy();
     expect(screen.getByText("v1.0.0")).toBeTruthy();
+    expect(runtime.ctx.components.mountNumberStepper).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ step: 0.1 }),
+    );
   });
 });

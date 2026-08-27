@@ -125,7 +125,7 @@ export function HostVolume(props: {
     if (!root.current) return;
     handle.current = props.ctx.components.mountRangeSlider(root.current, {
       label: "Volume",
-      hint: "Applied immediately to the supplied MP3.",
+      hint: "Changes apply immediately.",
       value: props.value,
       min: 0,
       max: 100,
@@ -161,7 +161,7 @@ export function HostSpeed(props: {
     if (!root.current) return;
     handle.current = props.ctx.components.mountRangeSlider(root.current, {
       label: "Playback speed",
-      hint: "Changes the pitch and duration of current and future scares.",
+      hint: "Controls playback rate and effective duration.",
       value: props.value,
       min: 0.25,
       max: 4,

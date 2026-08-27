@@ -117,7 +117,7 @@ export class LumiWhyyyRuntime {
       if (!granted) return;
     }
     await this.patchSettings({ enabled });
-    this.notify(enabled ? "success" : "info", enabled ? "LumiWHYYY is armed." : "LumiWHYYY is disarmed.");
+    this.notify(enabled ? "success" : "info", enabled ? "Recurring playback enabled." : "Recurring playback disabled.");
   }
 
   async setIntervalValue(value: number): Promise<void> {
@@ -152,7 +152,7 @@ export class LumiWhyyyRuntime {
     this.ensurePresenter();
     if (!this.presenter) return;
     if (!this.scheduler.triggerNow()) {
-      this.notify("info", "Foxy is already on screen.");
+      this.notify("info", "A jumpscare is already active.");
     }
   }
 
@@ -217,7 +217,7 @@ export class LumiWhyyyRuntime {
     if (this.snapshot.permissions.uiPanels) return true;
     try {
       const granted = await this.ctx.permissions.request(["ui_panels"], {
-        reason: "LumiWHYYY needs an overlay surface to display the fullscreen Foxy jumpscare.",
+        reason: "LumiWHYYY requires overlay access to display fullscreen jumpscares.",
       });
       const uiPanels = granted.includes("ui_panels");
       this.applyPermission(uiPanels);
@@ -327,7 +327,7 @@ export class LumiWhyyyRuntime {
         widget,
         this.audio,
         this.imageUrl,
-        (error) => this.notify("warning", `${error.message} Foxy still showed up.`),
+        (error) => this.notify("warning", `${error.message} The image remained visible.`),
       );
     } catch (error) {
       this.presenter = null;

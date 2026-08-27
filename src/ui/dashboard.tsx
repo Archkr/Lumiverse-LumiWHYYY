@@ -14,37 +14,37 @@ export interface StatusPresentation {
 export function statusPresentation(state: RuntimeSnapshot): StatusPresentation {
   if (!state.connected) return {
     label: "Connecting",
-    detail: "Waiting for the LumiWHYYY backend.",
+    detail: "Connecting to extension services.",
     tone: "neutral",
   };
   if (!state.settings.enabled) return {
-    label: "Disarmed",
-    detail: "Foxy is safely contained. For now.",
+    label: "Disabled",
+    detail: "Recurring jumpscares are turned off.",
     tone: "neutral",
   };
   if (!state.permissions.uiPanels) return {
-    label: "Needs access",
-    detail: "Grant overlay access before the countdown can begin.",
+    label: "Permission required",
+    detail: "Grant overlay access to enable fullscreen playback.",
     tone: "warning",
   };
   if (!state.gestureSeen) return {
-    label: "Awaiting interaction",
-    detail: "Click or press a key once so the browser can unlock sound.",
+    label: "Interaction required",
+    detail: "Interact with Lumiverse once to enable browser audio.",
     tone: "warning",
   };
   if (state.scheduler.status === "scaring") return {
-    label: "FOXY",
-    detail: "Well. There he is.",
+    label: "Playing",
+    detail: "A jumpscare is currently active.",
     tone: "danger",
   };
   if (state.scheduler.status === "paused") return {
     label: "Paused",
-    detail: "The countdown waits while Lumiverse is hidden.",
+    detail: "The countdown is paused while Lumiverse is hidden.",
     tone: "neutral",
   };
   return {
-    label: "Armed",
-    detail: "The countdown advances only while this page is visible.",
+    label: "Scheduled",
+    detail: "The countdown advances while Lumiverse is visible.",
     tone: "accent",
   };
 }
@@ -144,7 +144,7 @@ export function Dashboard({
             </svg>
             <div>
               <span>{state.settings.enabled && state.gestureSeen && state.permissions.uiPanels ? formatCountdown(state.scheduler.remainingMs) : "--:--"}</span>
-              <small>next visit</small>
+              <small>next playback</small>
             </div>
           </div>
           <div class="lw-status-copy">
@@ -152,8 +152,8 @@ export function Dashboard({
             <strong>{status.detail}</strong>
             <small>
               {state.lastScareAt
-                ? `Last appearance ${new Date(state.lastScareAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}`
-                : "No appearances this session"}
+                ? `Last playback ${new Date(state.lastScareAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}`
+                : "No playback this session"}
             </small>
           </div>
         </section>
@@ -162,8 +162,8 @@ export function Dashboard({
           <section class="lw-permission-card">
             <div class="lw-permission-icon"><Icon name="shield" size={19} /></div>
             <div>
-              <strong>Overlay access required</strong>
-              <p>Lumiverse uses the <code>ui_panels</code> permission for the fullscreen scare surface.</p>
+              <strong>Overlay permission required</strong>
+              <p>The <code>ui_panels</code> permission is required to display the fullscreen image.</p>
             </div>
             <Button
               variant="primary"
@@ -179,20 +179,20 @@ export function Dashboard({
           <div class="lw-panel-title">
             <div class="lw-title-icon"><Icon name="fox" size={18} /></div>
             <div>
-              <h2>Containment controls</h2>
-              <p>Arming is remembered. Each reload begins with a fresh countdown.</p>
+              <h2>Schedule</h2>
+              <p>Enable recurring playback. This setting persists across reloads.</p>
             </div>
           </div>
           <div class="lw-arm-row">
             <div>
-              <strong>{state.settings.enabled ? "Jumpscares armed" : "Jumpscares disarmed"}</strong>
-              <span>{state.settings.enabled ? "Foxy has been released into the scheduler." : "Nothing terrible is currently scheduled."}</span>
+              <strong>Recurring playback</strong>
+              <span>{state.settings.enabled ? "Enabled" : "Disabled"}</span>
             </div>
             <HostSwitch
               ctx={runtime.ctx}
               checked={state.settings.enabled}
               disabled={!state.connected || state.saving}
-              label="Arm recurring jumpscares"
+              label="Enable recurring jumpscares"
               onChange={(enabled) => run(runtime.setEnabled(enabled))}
             />
           </div>
@@ -202,11 +202,11 @@ export function Dashboard({
           <div class="lw-panel-title">
             <div class="lw-title-icon"><Icon name="clock" size={18} /></div>
             <div>
-              <h2>Timing</h2>
-              <p>A full quiet interval begins after Foxy leaves the screen.</p>
+              <h2>Interval</h2>
+              <p>A new interval starts after playback or dismissal.</p>
             </div>
           </div>
-          <label class="lw-field-label">Scare every</label>
+          <label class="lw-field-label">Playback interval</label>
           <div class="lw-interval-grid">
             <HostNumber
               ctx={runtime.ctx}
@@ -224,15 +224,15 @@ export function Dashboard({
               }}
             />
           </div>
-          <p class="lw-field-help">Use any positive duration. Time spent in a hidden tab never counts.</p>
+          <p class="lw-field-help">Enter any positive duration. The countdown pauses while Lumiverse is hidden.</p>
         </section>
 
         <section class="lw-panel">
           <div class="lw-panel-title">
             <div class="lw-title-icon"><Icon name="sound" size={18} /></div>
             <div>
-              <h2>Impact</h2>
-              <p>Tune the volume and velocity of Foxy’s arrival.</p>
+              <h2>Audio</h2>
+              <p>Configure the jumpscare audio output.</p>
             </div>
           </div>
           <div class="lw-impact-controls">
@@ -251,21 +251,21 @@ export function Dashboard({
           </div>
           <div class="lw-test-row">
             <div>
-              <strong>Quality assurance</strong>
-              <span>Does not arm the recurring timer by itself.</span>
+              <strong>Preview</strong>
+              <span>Runs once without changing the recurring schedule.</span>
             </div>
             <Button
               icon="play"
               disabled={!state.connected || state.scheduler.status === "scaring"}
               onClick={() => run(runtime.testScare())}
             >
-              Test jumpscare
+              Run preview
             </Button>
           </div>
         </section>
 
         <footer class="lw-footer">
-          <span><i /> Local media only</span>
+          <span><i /> Bundled media</span>
           <span>{state.saving ? "Saving…" : state.connected ? "Settings synced" : "Connecting…"}</span>
         </footer>
       </div>

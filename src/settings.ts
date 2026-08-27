@@ -16,7 +16,7 @@ export interface IntervalUnitSpec {
 }
 
 export const INTERVAL_UNIT_SPECS: Record<IntervalUnit, IntervalUnitSpec> = {
-  seconds: { factor: 1, step: 1, decimals: 3, suffix: " sec" },
+  seconds: { factor: 1, step: 0.1, decimals: 3, suffix: " sec" },
   minutes: { factor: 60, step: 0.1, decimals: 4, suffix: " min" },
   hours: { factor: 3_600, step: 0.01, decimals: 6, suffix: " hr" },
 };
